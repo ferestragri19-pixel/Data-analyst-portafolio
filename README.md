@@ -7,7 +7,7 @@ Beyond technical work, I enjoy continuously learning new technologies and expand
 
 This repository showcases my projects, technical skills, and progress in data analysis, engineering, and technology-related topics.
 
-My [CV]([https://yourwebsite.com](https://github.com/ferestragri19-pixel/Data-analyst-portafolio/blob/main/Fernanda%20Estrada%20Grijalva%20-%20Chemical%20Engineer.pdf)) in pdf
+My [CV](#Fernanda-Estrada-Grijalva---Chemical Engineer.pdf)
 
 ## Table of Contents
 - [About Me](#fernanda-estrada---data-analyst-portfolio)
