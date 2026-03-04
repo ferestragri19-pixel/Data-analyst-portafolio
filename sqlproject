@@ -40,3 +40,75 @@ crd.to_sql('chicago_crime_data',conn, if_exists='replace', index=False, method='
 SELECT count(*) as 'Total Number of Crimes' FROM chicago_crime_data
 
 ----------------------------------------------------------------------
+-- List of community area names and numbers with per capita income less than 11000.
+%%sql
+select community_area_name, community_area_number, per_capita_income
+from chicago_census_data
+where per_capita_income < 11000
+order by per_capita_income
+
+----------------------------------------------------------------------
+-- Case numbers for crimes involving minors
+%%sql
+select case_number, description
+from chicago_crime_data
+where description like '%minor%'
+
+----------------------------------------------------------------------
+-- Kidnapping crimes involving a childs
+%%sql
+select case_number, primary_type, description
+from chicago_crime_data
+where description like '%child%' and primary_type like '%kidnap%'
+
+----------------------------------------------------------------------
+-- Kind of crimes at school
+%%sql
+select distinct primary_type as 'kinds of crimes'
+from chicago_crime_data
+where location_description like '%school%'
+
+----------------------------------------------------------------------
+-- Type of schools along with average safety score of each type
+%%sql
+select [Elementary, Middle, or High School] as 'Type of school', round(avg(safety_score),1) as 'Average safety score'
+from chicago_public_schools_data
+group by [Elementary, Middle, or High School];
+
+----------------------------------------------------------------------
+-- 5 community areas with highest % of households below poverty line
+%%sql
+select community_area_name, PERCENT_HOUSEHOLDS_BELOW_POVERTY
+from chicago_census_data
+order by PERCENT_HOUSEHOLDS_BELOW_POVERTY desc
+limit 5
+
+----------------------------------------------------------------------
+-- Community area number who is most crime prone
+%%sql
+SELECT community_area_number
+FROM chicago_crime_data
+GROUP BY community_area_number
+ORDER BY COUNT(*) DESC
+LIMIT 1
+
+----------------------------------------------------------------------
+-- Sub-query to find the name of the community area with highest hardship index
+%%sql
+select community_area_name, hardship_index
+from chicago_census_data
+where hardship_index = (select max(hardship_index) from chicago_census_data)
+
+
+----------------------------------------------------------------------
+-- Sub-query to determine the Community Area Name with most number of crimes
+%%sql
+select cen.community_area_name, cen.community_area_number
+from chicago_census_data as cen
+where cen.community_area_number = (
+    select cr.community_area_number
+    from chicago_crime_data as cr
+    group by cr.community_area_number
+    order by count(*) desc
+    limit 1
+    )
