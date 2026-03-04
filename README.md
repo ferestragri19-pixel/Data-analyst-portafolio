@@ -48,7 +48,7 @@ SQL analysis exploring relationships between crime rates, socioeconomic indicato
 
 Tools: SQL, Python, SQlite, Pandas, Jupyter Notebook
 
-[View Dashboard](https://github.com/ferestragri19-pixel/Data-analyst-portafolio/blob/main/Database%20Querying%20using%20SQLite)
+[View Project](https://github.com/ferestragri19-pixel/Data-analyst-portafolio/blob/main/Database%20Querying%20using%20SQLite)
 
 
 ## Certificates 
