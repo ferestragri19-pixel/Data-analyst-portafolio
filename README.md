@@ -51,7 +51,7 @@ Relational database in SQLite that include analysis queries answering business q
 - How does revenue trend month to month?
 - Which products have the highest discount impact?
 
-[View Dashboard](https://link)
+[View Dashboard](https://github.com/ferestragri19-pixel/Data-analyst-portafolio/blob/main/Database%20Querying%20using%20SQLite)
 
 
 ## Certificates 
