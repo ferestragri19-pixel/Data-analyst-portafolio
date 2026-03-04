@@ -1,134 +1,42 @@
 
--- Analysis Queries
+-- Installing required libraries
 -----------------------------------------------------------------------
--- Company KPIs: Revenue, Cost, Profit, Margin
+!pip install pandas
+!pip install ipython-sql prettytable 
 
-SELECT
-  ROUND(SUM(net_revenue), 2) AS revenue,
-  ROUND(SUM(total_cost), 2) AS cost,
-  ROUND(SUM(gross_profit), 2) AS gross_profit,
-  ROUND(SUM(gross_profit) / NULLIF(SUM(net_revenue), 0), 4) AS gross_margin
-FROM v_order_lines;
+import prettytable
 
+prettytable.DEFAULT = 'DEFAULT'
 
 -----------------------------------------------------------------------
--- Monthly Revenue Trend
+-- Loading pandas and sqlite3 
 
-SELECT
-  substr(order_date, 1, 7) AS year_month,
-  ROUND(SUM(net_revenue), 2) AS revenue,
-  ROUND(SUM(gross_profit), 2) AS gross_profit
-FROM v_order_lines
-GROUP BY 1
-ORDER BY 1;
-
+import pandas as pd
+import sqlite3
+conn = sqlite3.connect('FindalDB.db')
 
 -----------------------------------------------------------------------
--- Channel Performance
-
-SELECT
-  channel,
-  COUNT(DISTINCT order_id) AS orders,
-  ROUND(SUM(net_revenue), 2) AS revenue,
-  ROUND(SUM(gross_profit), 2) AS gross_profit,
-  ROUND(AVG(net_revenue), 2) AS avg_line_revenue
-FROM v_order_lines
-GROUP BY 1
-ORDER BY revenue DESC;
-
+-- Loading sqlmagic
+%load_ext sql
 
 -----------------------------------------------------------------------
--- Average Order Value (AOV)
+-- Using Pandas to load data available to the dataframes
+dfce = pd.read_csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoCensusData.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01')
+ced.to_sql('chicago_census_data',conn, if_exists='replace', index=False, method='multi')
 
-WITH order_totals AS (
-  SELECT
-    order_id,
-    ROUND(SUM(net_revenue), 2) AS order_revenue
-  FROM v_order_lines
-  GROUP BY order_id
-)
-SELECT
-  ROUND(AVG(order_revenue), 2) AS avg_order_value,
-  MIN(order_revenue) AS min_order_value,
-  MAX(order_revenue) AS max_order_value
-FROM order_totals;
+dfcp = pd.read_csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoPublicSchools.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01')
+cps.to_sql('chicago_public_schools_data',conn, if_exists='replace', index=False, method='multi')
 
+dfcr = pd.read_csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoCrimeData.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01')
+crd.to_sql('chicago_crime_data',conn, if_exists='replace', index=False, method='multi')
 
------------------------------------------------------------------------
--- Top Products by Profit
+----------------------------------------------------------------------
+-- Connection between SQL magic module and the database `FinalDB.db`
+%sql sqlite:///FinalDB.db
 
-SELECT
-  product_name,
-  category,
-  ROUND(SUM(net_revenue), 2) AS revenue,
-  ROUND(SUM(gross_profit), 2) AS gross_profit,
-  ROUND(SUM(gross_profit) / NULLIF(SUM(net_revenue), 0), 4) AS margin
-FROM v_order_lines
-GROUP BY 1, 2
-ORDER BY gross_profit DESC;
+----------------------------------------------------------------------
+-- Finding total number of crimes recorded
+%%sql
+SELECT count(*) as 'Total Number of Crimes' FROM chicago_crime_data
 
-
------------------------------------------------------------------------
--- Discount Impact (How much revenue was "given up" due to discounts)
-
-SELECT
-  product_name,
-  ROUND(SUM(gross_revenue - net_revenue), 2) AS discount_value,
-  ROUND(SUM(net_revenue), 2) AS net_revenue
-FROM v_order_lines
-GROUP BY 1
-ORDER BY discount_value DESC;
-
-
------------------------------------------------------------------------
--- Top Customers by Revenue
-
-SELECT
-  customer_name,
-  segment,
-  city,
-  COUNT(DISTINCT order_id) AS orders,
-  ROUND(SUM(net_revenue), 2) AS revenue,
-  ROUND(SUM(gross_profit), 2) AS gross_profit
-FROM v_order_lines
-GROUP BY 1,2,3
-ORDER BY revenue DESC;
-
-
------------------------------------------------------------------------
--- Category Performance
-
-SELECT
-  category,
-  ROUND(SUM(net_revenue), 2) AS revenue,
-  ROUND(SUM(gross_profit), 2) AS gross_profit,
-  ROUND(SUM(gross_profit) / NULLIF(SUM(net_revenue), 0), 4) AS gross_margin
-FROM v_order_lines
-GROUP BY 1
-ORDER BY revenue DESC;
-
-
-
------------------------------------------------------------------------
--- Low Stock Risk (threshold example <= 5)
-
-SELECT
-  product_name,
-  on_hand
-FROM v_stock_on_hand
-WHERE on_hand <= 5
-ORDER BY on_hand ASC;
-
-
------------------------------------------------------------------------
--- Last Movement Date per Product (inventory “freshness”)
-
-SELECT
-  p.product_name,
-  MAX(im.move_date_clean) AS last_move_date
-FROM products p
-LEFT JOIN inventory_movements im ON im.product_id = p.product_id
-GROUP BY p.product_name
-ORDER BY last_move_date DESC;
-
-
+----------------------------------------------------------------------
