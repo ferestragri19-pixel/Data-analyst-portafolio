@@ -43,13 +43,10 @@ Tools: Power BI, Excel
 
 ---
 
-## Retail & Inventory Analytics
-Relational database in SQLite that include analysis queries answering business questions such as:
+## 🗂️ Chicago Community Data Analysis using SQL and Python
+SQL analysis exploring relationships between crime rates, socioeconomic indicators, and public school data across Chicago communities.
 
-- What are total revenue, cost, and gross margin?
-- Which products and customers drive the most profit?
-- How does revenue trend month to month?
-- Which products have the highest discount impact?
+Tools: SQL, Python, SQlite, Pandas, Jupyter Notebook
 
 [View Dashboard](https://github.com/ferestragri19-pixel/Data-analyst-portafolio/blob/main/Database%20Querying%20using%20SQLite)
 
